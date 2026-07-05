@@ -2,6 +2,7 @@ const User   = require("../models/User");
 const Scheme = require("../models/Scheme");
 const Payment = require("../models/Payment");
 const ProfileUpdateRequest = require("../models/ProfileUpdateRequest");
+const { normalizeFileUrl } = require("../utils/fileUrl");
 
 // @GET /api/users — get all users for this admin's shop
 const getAllUsers = async (req, res) => {
@@ -224,7 +225,7 @@ const findUserForChit = async (req, res) => {
 const requestProfileUpdate = async (req, res) => {
   try {
     const { name, phone } = req.body;
-    const userPhoto = req.file ? req.file.path.replace(/\\/g, "/") : null;
+    const userPhoto = req.file ? normalizeFileUrl(req.file.path) : null;
 
     if (!name && !phone && !userPhoto) {
       return res.status(400).json({ success: false, message: "No changes requested" });
@@ -234,7 +235,7 @@ const requestProfileUpdate = async (req, res) => {
     if (name) requestedChanges.name = name;
     if (phone) requestedChanges.phone = phone;
     if (userPhoto) {
-      requestedChanges.userPhoto = "/" + (userPhoto.startsWith("/") ? userPhoto.slice(1) : userPhoto);
+      requestedChanges.userPhoto = userPhoto;
     }
 
     // Check if there's already a pending request

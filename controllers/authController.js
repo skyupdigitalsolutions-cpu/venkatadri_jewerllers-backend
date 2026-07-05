@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
 const User = require("../models/User");
 const { sendSMS, sendMsg91Otp } = require("../utils/smsHelper");
+const { normalizeFileUrl } = require("../utils/fileUrl");
 
 const generateToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -489,8 +490,7 @@ const updateShopSettings = async (req, res) => {
     if (isVal(accountName))   admin.accountName = accountName.trim();
 
     if (photoFile) {
-      const normalizedPhoto = photoFile.path.replace(/\\/g, "/");
-      admin.adminPhoto = "/" + (normalizedPhoto.startsWith("/") ? normalizedPhoto.slice(1) : normalizedPhoto);
+      admin.adminPhoto = normalizeFileUrl(photoFile.path);
     }
 
     await admin.save();

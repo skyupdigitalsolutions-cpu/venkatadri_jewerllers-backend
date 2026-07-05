@@ -1,6 +1,7 @@
 const Payment = require("../models/Payment");
 const Scheme = require("../models/Scheme");
 const GoldRate = require("../models/GoldRate");
+const { normalizeFileUrl } = require("../utils/fileUrl");
 
 // @GET /api/payments
 const getAllPayments = async (req, res) => {
@@ -269,8 +270,7 @@ const submitPaymentScreenshot = async (req, res) => {
 
     let screenshotUrl = "";
     if (hasScreenshot) {
-      const normalized = req.file.path.replace(/\\/g, "/");
-      screenshotUrl = "/" + (normalized.startsWith("/") ? normalized.slice(1) : normalized);
+      screenshotUrl = normalizeFileUrl(req.file.path);
     }
 
     // Get current gold rate
@@ -487,8 +487,7 @@ const editPaymentProof = async (req, res) => {
     }
 
     if (hasScreenshot) {
-      const normalized = req.file.path.replace(/\\/g, "/");
-      payment.screenshotUrl = "/" + (normalized.startsWith("/") ? normalized.slice(1) : normalized);
+      payment.screenshotUrl = normalizeFileUrl(req.file.path);
       // Do NOT reset screenshotUploadedAt — the 10-min window stays from original submit
     }
     if (hasUtr) payment.utrNumber = utrNumber.trim();

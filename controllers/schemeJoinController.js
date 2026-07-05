@@ -5,6 +5,7 @@ const Payment           = require("../models/Payment");
 const GoldRate          = require("../models/GoldRate");
 const User              = require("../models/User");
 const Plan              = require("../models/Plan");
+const { normalizeFileUrl } = require("../utils/fileUrl");
 
 // @GET /api/scheme-join/my  — user sees own join requests
 const getUserRequests = async (req, res) => {
@@ -356,8 +357,7 @@ const submitFirstPaymentProof = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please provide screenshot or UTR number as payment proof" });
 
     if (hasScreenshot) {
-      const normalized = req.file.path.replace(/\\/g, "/");
-      joinReq.screenshotUrl = "/" + (normalized.startsWith("/") ? normalized.slice(1) : normalized);
+      joinReq.screenshotUrl = normalizeFileUrl(req.file.path);
     }
     if (hasUtr) joinReq.utrNumber = utrNumber.trim();
     if (userNote) joinReq.userNote = userNote.trim();
