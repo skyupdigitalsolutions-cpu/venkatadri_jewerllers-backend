@@ -13,13 +13,15 @@ connectDB();
 const app = express();
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
-app.use(
-  cors({
-    origin: (process.env.CORS_ORIGINS ||
-      "http://localhost:5173,http://localhost:5174,http://localhost:5175,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175").split(",").map(s => s.trim()),
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || origin.endsWith(".pages.dev") || origin.startsWith("http://localhost")) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
